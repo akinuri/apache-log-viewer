@@ -27,9 +27,8 @@ on("#parse-btn", "click", () => {
     let ipIndex = 1;
     ipCountBody.innerHTML = "";
     for (const entry of filteredIpFrequency) {
-        ipCountBody.append( buildRequestCountLine(entry, ipIndex++) );
+        ipCountBody.append( buildCountLine(entry, ipIndex++) );
     }
-    
     
     let methodFrequency = calcFrequency(getColumn(logs, "method"));
     methodFrequency = Object.entries(methodFrequency);
@@ -37,7 +36,7 @@ on("#parse-btn", "click", () => {
     let methodIndex = 1;
     methodCountBody.innerHTML = "";
     for (const entry of methodFrequency) {
-        methodCountBody.append( buildRequestCountLine(entry, methodIndex++) );
+        methodCountBody.append( buildCountLine(entry, methodIndex++) );
     }
 });
 
@@ -64,7 +63,7 @@ function buildLogLine(log, index) {
     );
 }
 
-function buildRequestCountLine(entry, index) {
+function buildCountLine(entry, index) {
     return elem(
         "tr",
         {
