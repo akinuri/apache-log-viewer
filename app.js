@@ -1,15 +1,15 @@
 let textInputBox = qs("#text-input");
 let logsBody = qs("#logs-table tbody");
-let ipRequestsBody = qs("#ip-requests-table tbody");
+let ipCountBody = qs("#ip-count-table tbody");
 
 on("#parse-btn", "click", () => {
     let logs = parseAccessLogs(textInputBox.value);
     let maxLogRowCount = 1000;
-    let logI = 1;
+    let logIndex = 1;
     logsBody.innerHTML = "";
     for (const log of logs) {
-        logsBody.append( buildLogLine(log, logI++) );
-        if (logI > maxLogRowCount) {
+        logsBody.append( buildLogLine(log, logIndex++) );
+        if (logIndex > maxLogRowCount) {
             break;
         }
     }
@@ -17,13 +17,14 @@ on("#parse-btn", "click", () => {
     ipFrequency = Object.entries(ipFrequency);
     ipFrequency = sortBy(ipFrequency, [1, -1], 0);
     let filteredIpFrequency = ipFrequency.filter(entry => entry[1] > 100);
+    filteredIpFrequency = filteredIpFrequency.slice(0, 10);
     if (filteredIpFrequency.length == 0) {
         filteredIpFrequency = ipFrequency.slice(0, 10);
     }
-    let reqI = 1;
-    ipRequestsBody.innerHTML = "";
+    let ipIndex = 1;
+    ipCountBody.innerHTML = "";
     for (const entry of filteredIpFrequency) {
-        ipRequestsBody.append( buildRequestCountLine(entry, reqI++) );
+        ipCountBody.append( buildRequestCountLine(entry, ipIndex++) );
     }
 });
 
