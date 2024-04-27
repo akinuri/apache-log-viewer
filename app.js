@@ -2,6 +2,7 @@ let textInputBox = qs("#text-input");
 let logsBody = qs("#logs-table tbody");
 let ipCountBody = qs("#ip-count-table tbody");
 let methodCountBody = qs("#method-count-table tbody");
+let protocolCountBody = qs("#protocol-count-table tbody");
 
 on("#parse-btn", "click", () => {
     let logs = parseAccessLogs(textInputBox.value);
@@ -38,6 +39,15 @@ on("#parse-btn", "click", () => {
     for (const entry of methodFrequency) {
         methodCountBody.append( buildCountLine(entry, methodIndex++) );
     }
+    
+    let protocolFrequency = calcFrequency(getColumn(logs, "protocol"));
+    protocolFrequency = Object.entries(protocolFrequency);
+    protocolFrequency = sortBy(protocolFrequency, [1, -1], 0);
+    let protocolIndex = 1;
+    protocolCountBody.innerHTML = "";
+    for (const entry of protocolFrequency) {
+        protocolCountBody.append( buildCountLine(entry, protocolIndex++) );
+    }
 });
 
 function buildLogLine(log, index) {
@@ -71,7 +81,7 @@ function buildCountLine(entry, index) {
         },
         [
             elem("td", index),
-            elem("td", entry[0]),
+            elem("td", entry[0] == "null" ? "" : entry[0]),
             elem("td", entry[1]),
         ],
     );
