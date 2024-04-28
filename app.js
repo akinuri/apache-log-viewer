@@ -57,7 +57,7 @@ on("#parse-btn", "click", () => {
 });
 
 function buildLogLine(log, index) {
-    return elem(
+    let row = elem(
         "tr",
         {
             "class" : "*:px-2 *:py-[2px] *:border hover:bg-slate-50",
@@ -68,15 +68,26 @@ function buildLogLine(log, index) {
             elem("td", log.identity),
             elem("td", log.user),
             elem("td", log.datetime),
-            elem("td", log.method),
-            elem("td", log.path),
-            elem("td", log.protocol),
-            elem("td", log.status),
-            elem("td", log.length),
-            elem("td", log.referrer),
-            elem("td", log.ua),
         ],
     );
+    if (log.request.method) {
+        row.append(
+            elem("td", log.request.method),
+            elem("td", log.request.path),
+            elem("td", log.request.protocol),
+        );
+    } else {
+        row.append(
+            elem("td", {"colspan" : 3, "class" : "bg-red-50"}, log.request.raw),
+        );
+    }
+    row.append(
+        elem("td", log.status),
+        elem("td", log.length),
+        elem("td", log.referrer),
+        elem("td", log.ua),
+    );
+    return row;
 }
 
 function buildCountLine(entry, index) {

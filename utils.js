@@ -9,31 +9,48 @@ function parseAccessLogs(text) {
 }
 
 function parseAccessLogLine(
-    text,
-    partNames = ["ip", "identity", "user", "datetime", "method", "path", "protocol", "status", "length", "referrer", "ua"],
+    logLine,
+    partNames = ["ip", "identity", "user", "datetime", "request", "status", "length", "referrer", "ua"],
 ) {
-    const regex = /[^\s"\[]+|"([^"]+)"|\[([^\]]+)\]/gi;
+    let request = parseAccessLogLineRequestPart(logLine);
+    logLine = logLine.replace('"' + request.raw + '"', "");
+    const splitPattern = /[^\s\[]+|\[([^\]]+)\]/gi;
     let parts = [];
     let match;
-    while ((match = regex.exec(text)) !== null) {
+    while ((match = splitPattern.exec(logLine)) !== null) {
         if (match[1]) {
-            let request = parseAccessLogRequestPart(match[1]);
-            parts.push(request);
-        } else if (match[2]) {
-            parts.push(match[2]);
+            parts.push(match[1]);
         } else {
             parts.push(match[0]);
         }
     }
-    parts.splice(4, 1, ...Object.values(parts[4]));
+    let requestIndex = partNames.indexOf("request");
+    if (requestIndex !== -1) {
+        parts.splice(requestIndex, 0, request);
+    }
     parts = arrayCombine(partNames, parts);
     return parts;
 }
 
-function parseAccessLogRequestPart(text, partNames = ["method", "path", "protocol"]) {
-    let parts = text.split(" ");
-    let result = arrayCombine(partNames, parts);
-    return result;
+function parseAccessLogLineRequestPart(logLine, partNames = ["method", "path", "protocol"]) {
+    let request = {
+        raw : /\] "(.*)" \d+ /s.exec(logLine)[1],
+    };
+    request = Object.assign(request, arrayCombine(partNames, Array(partNames.length).fill(null)));
+    let isRegularRequest = /^(GET|POST|HEAD|CONNECT|OPTIONS|PUT|PATCH|DELETE|TRACE)/.exec(request.raw);
+    if (isRegularRequest) {
+        let parts = request.raw.split(" ");
+        let namedParts = arrayCombine(partNames, parts);
+        request = Object.assign(request, namedParts);
+    }
+    if (request.protocol && request.protocol.includes("\\n")) {
+        request.protocol = request.protocol.replace("\\n", "");
+    }
+    if (request.protocol && !request.protocol.startsWith("HTTP/")) {
+        request.path += " " + request.protocol;
+        request.protocol = null;
+    }
+    return request;
 }
 
 function arrayCombine(keys, values) {
