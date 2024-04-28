@@ -28,7 +28,7 @@ on("#parse-btn", "click", () => {
         ipCountBody.append( buildCountLine(entry, ipIndex++) );
     }
     
-    let methodFrequency = calcFrequency(getColumn(logs, "method"));
+    let methodFrequency = calcFrequency(getColumn(logs, "request.method"));
     methodFrequency = Object.entries(methodFrequency);
     methodFrequency = sortBy(methodFrequency, [1, -1], 0);
     let methodIndex = 1;
@@ -37,7 +37,7 @@ on("#parse-btn", "click", () => {
         methodCountBody.append( buildCountLine(entry, methodIndex++) );
     }
     
-    let protocolFrequency = calcFrequency(getColumn(logs, "protocol"));
+    let protocolFrequency = calcFrequency(getColumn(logs, "request.protocol"));
     protocolFrequency = Object.entries(protocolFrequency);
     protocolFrequency = sortBy(protocolFrequency, [1, -1], 0);
     let protocolIndex = 1;

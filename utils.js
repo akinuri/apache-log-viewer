@@ -78,7 +78,26 @@ function calcFrequency(array) {
 }
 
 function getColumn(array, columnName) {
-    return array.map(item => item[columnName]);
+    return array.map(item => {
+        if (columnName.includes(".")) {
+            return getObjProp(item, columnName);
+        }
+        return item[columnName];
+    });
+}
+
+function getObjProp(obj, path, fallback) {
+    const pathProps = path.split(".");
+    let prop = obj;
+    for (let i = 0; i < pathProps.length; i++) {
+        const pathProp = pathProps[i];
+        if (prop && prop.hasOwnProperty(pathProp)) {
+            prop = prop[pathProp];
+        } else {
+            return fallback;
+        }
+    }
+    return prop;
 }
 
 function sortBy(array, firstColumnName, secondColumnName) {
