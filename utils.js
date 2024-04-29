@@ -24,8 +24,11 @@ function calcFrequency(array) {
 
 function getColumn(array, columnName) {
     return array.map(item => {
-        if (columnName.includes(".")) {
+        if (typeof columnName == "string" && columnName.includes(".")) {
             return getObjProp(item, columnName);
+        }
+        else if (typeof columnName == "function") {
+            return columnName(item);
         }
         return item[columnName];
     });
@@ -128,4 +131,18 @@ function isoDateTimeFromParsedDate(obj) {
         datetime += obj.timezone;
     }
     return datetime;
+}
+
+function isoDateFromParsedDate(obj) {
+    let date = null;
+    if (obj.year && obj.month && obj.day) {
+        date = [obj.year, obj.month, obj.day].join("-");
+    }
+    return date;
+}
+
+function parseISODateTime(dateStr) {
+    let parts = dateStr.split(/-|\s|:/);
+    let namedParts = arrayCombine(["year", "month", "day", "hour", "minute", "second", "timezone"], parts);
+    return namedParts;
 }
