@@ -29,12 +29,13 @@ function parseAccessLogLine(
         parts.splice(requestIndex, 0, request);
     }
     parts = arrayCombine(partNames, parts);
+    parts.datetime = isoDateTimeFromParsedDate(parseAccessLogDate(parts.datetime));
     return parts;
 }
 
 function parseAccessLogLineRequestPart(logLine, partNames = ["method", "path", "protocol"]) {
     let request = {
-        raw : /\] "(.*)" \d+ /s.exec(logLine)[1],
+        raw: /\] "(.*)" \d+ /s.exec(logLine)[1],
     };
     request = Object.assign(request, arrayCombine(partNames, Array(partNames.length).fill(null)));
     let isRegularRequest = /^(GET|POST|HEAD|CONNECT|OPTIONS|PUT|PATCH|DELETE|TRACE)/.exec(request.raw);
@@ -51,4 +52,11 @@ function parseAccessLogLineRequestPart(logLine, partNames = ["method", "path", "
         request.protocol = null;
     }
     return request;
+}
+
+function parseAccessLogDate(dateStr) {
+    let parts = dateStr.split(/\/|:|\s/);
+    let namedParts = arrayCombine(["day", "month", "year", "hour", "minute", "second", "timezone"], parts);
+    namedParts.month = getMonthIndexByName(namedParts.month);
+    return namedParts;
 }

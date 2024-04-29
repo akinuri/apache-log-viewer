@@ -78,3 +78,54 @@ function sortBy(array, firstColumnName, secondColumnName) {
         return 0;
     });
 }
+
+function getMonthIndexByName(monthName) {
+    let months = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+    ];
+    let index = months.findIndex(month => {
+        return month == monthName || month.slice(0, 3) == monthName;
+    });
+    if (index !== -1) {
+        index++;
+    } else {
+        index = null;
+    }
+    if (index) {
+        index = (index).toString().padStart(2, "0");
+    }
+    return index;
+}
+
+function isoDateTimeFromParsedDate(obj) {
+    let datetime = "";
+    if (obj.year && obj.month && obj.day) {
+        let date = [obj.year, obj.month, obj.day].join("-");
+        datetime += date;
+    }
+    if (obj.hour && obj.minute && obj.second) {
+        let time = [obj.hour, obj.minute, obj.second].join(":");
+        if (datetime) {
+            datetime += " ";
+        }
+        datetime += time;
+    }
+    if (obj.timezone) {
+        if (datetime) {
+            datetime += " ";
+        }
+        datetime += obj.timezone;
+    }
+    return datetime;
+}
