@@ -1,4 +1,5 @@
-let textInputBox = qs("#text-input");
+let accessLogTextInputBox = qs("#access-log-text-input");
+let pathGroupsInputBox = qs("#path-groups-input");
 let logsBody = qs("#logs-table tbody");
 let ipCountBody = qs("#ip-count-table tbody");
 let dateCountBody = qs("#date-count-table tbody");
@@ -6,8 +7,14 @@ let methodCountBody = qs("#method-count-table tbody");
 let protocolCountBody = qs("#protocol-count-table tbody");
 let statusCountBody = qs("#status-count-table tbody");
 
+on(pathGroupsInputBox, "input", debounce(() => {
+    pathGroupsInputBox.value = trimTextWhitespace(pathGroupsInputBox.value);
+}));
+
+trigger(pathGroupsInputBox, "input");
+
 on("#parse-btn", "click", () => {
-    let logs = parseAccessLogs(textInputBox.value);
+    let logs = parseAccessLogs(accessLogTextInputBox.value);
     
     let maxLogRowCount = 1000;
     let logIndex = 1;

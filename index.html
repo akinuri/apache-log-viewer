@@ -20,7 +20,23 @@
                 class="bg-slate-200 hover:bg-slate-300/75 active:bg-slate-300 rounded px-3 py-1"
                 >Parse</button>
         </div>
-        <textarea id="text-input" rows="5" class="block w-full font-mono text-sm whitespace-nowrap border px-2 py-1 mt-4 bg-gray-50"></textarea>
+        <textarea
+            id="access-log-text-input"
+            rows="5"
+            class="block w-full font-mono text-sm whitespace-nowrap border px-2 py-1 mt-4 bg-gray-50"
+            placeholder="access_log text"
+            ></textarea>
+        <textarea
+            id="path-groups-input"
+            rows="5"
+            class="block w-full font-mono text-sm border px-2 py-1 mt-4 bg-gray-50"
+            >
+            path group: regex
+            assets: ^\/assets
+            uploads: ^\/uploads
+            gate: ^\/gate
+            dashboard: ^\/dashboard
+        </textarea>
     </div>
     
     <div class="bg-white p-4 rounded shadow min-h-[100px] mt-4 flex gap-4 items-start">
