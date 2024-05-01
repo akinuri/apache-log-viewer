@@ -17,15 +17,7 @@ trigger(pathGroupsInputBox, "input");
 on("#parse-btn", "click", () => {
     let logs = parseAccessLogs(accessLogTextInputBox.value);
     
-    let maxLogRowCount = 1000;
-    let logIndex = 1;
-    logsBody.innerHTML = "";
-    for (const log of logs) {
-        logsBody.append( buildLogLine(log, logIndex++) );
-        if (logIndex > maxLogRowCount) {
-            break;
-        }
-    }
+    printLogsLines(logs);
     
     let ipFrequency = calcFrequency(getColumn(logs, "ip"));
     ipFrequency = Object.entries(ipFrequency);
@@ -113,6 +105,18 @@ on("#parse-btn", "click", () => {
         statusCountBody.append( buildCountLine(entry, statusIndex++) );
     }
 });
+
+function printLogsLines(logs) {
+    let maxLogRowCount = 1000;
+    let logIndex = 1;
+    logsBody.innerHTML = "";
+    for (const log of logs) {
+        logsBody.append( buildLogLine(log, logIndex++) );
+        if (logIndex > maxLogRowCount) {
+            break;
+        }
+    }
+}
 
 function buildLogLine(log, index) {
     let row = elem(
