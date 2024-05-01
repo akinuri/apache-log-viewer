@@ -11,6 +11,7 @@ let protocolCountBody = qs("#protocol-count-table tbody");
 let statusCountBody = qs("#status-count-table tbody");
 
 let ipBytesTable = qs("#ip-bytes-table tbody");
+let dateBytesTable = qs("#date-bytes-table tbody");
 
 on(pathGroupsInputBox, "input", debounce(() => {
     pathGroupsInputBox.value = trimTextWhitespace(pathGroupsInputBox.value);
@@ -30,6 +31,7 @@ on("#parse-btn", "click", () => {
     printStatusRequestCounts(logs);
     
     printIpRequestBytes(logs);
+    printDateRequestBytes(logs);
 });
 
 
@@ -220,6 +222,37 @@ function printIpRequestBytes(logs) {
     ipBytesTable.innerHTML = "";
     for (const entry of bytes) {
         ipBytesTable.append( buildCountLine(entry, byteIndex++) );
+    }
+}
+
+function printDateRequestBytes(logs) {
+    let bytes = {};
+    let dates = Array.from(
+        new Set(
+            getColumn(
+                logs,
+                log => isoDateFromParsedDate(parseISODateTime(log.datetime))
+            )
+        )
+    );
+    for (const date of dates) {
+        let dateRequests = logs.filter(
+            log => isoDateFromParsedDate(parseISODateTime(log.datetime)) == date
+        );
+        let dateBytes = getColumn(dateRequests, "length")
+            .filter(value => value != "-")
+            .map(value => parseInt(value));
+        dateBytes = sum(dateBytes);
+        dateBytes = parseFloat((dateBytes / 1024 / 1024).toFixed(2));
+        bytes[date] = dateBytes;
+    }
+    bytes = Object.entries(bytes);
+    bytes = sortBy(bytes, [1, -1], 0);
+    bytes = bytes.slice(0, 10);
+    let byteIndex = 1;
+    dateBytesTable.innerHTML = "";
+    for (const entry of bytes) {
+        dateBytesTable.append( buildCountLine(entry, byteIndex++) );
     }
 }
 
