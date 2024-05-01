@@ -12,6 +12,7 @@ let statusCountBody = qs("#status-count-table tbody");
 
 let ipBytesTable = qs("#ip-bytes-table tbody");
 let dateBytesTable = qs("#date-bytes-table tbody");
+let methodBytesTable = qs("#method-bytes-table tbody");
 
 on(pathGroupsInputBox, "input", debounce(() => {
     pathGroupsInputBox.value = trimTextWhitespace(pathGroupsInputBox.value);
@@ -32,6 +33,7 @@ on("#parse-btn", "click", () => {
     
     printIpRequestBytes(logs);
     printDateRequestBytes(logs);
+    printMethodRequestBytes(logs);
 });
 
 
@@ -253,6 +255,28 @@ function printDateRequestBytes(logs) {
     dateBytesTable.innerHTML = "";
     for (const entry of bytes) {
         dateBytesTable.append( buildCountLine(entry, byteIndex++) );
+    }
+}
+
+function printMethodRequestBytes(logs) {
+    let bytes = {};
+    let methods = Array.from(new Set(getColumn(logs, "request.method")));
+    for (const method of methods) {
+        let methodRequests = logs.filter(log => log.request.method == method);
+        let methodBytes = getColumn(methodRequests, "length")
+            .filter(value => value != "-")
+            .map(value => parseInt(value));
+        methodBytes = sum(methodBytes);
+        methodBytes = parseFloat((methodBytes / 1024 / 1024).toFixed(2));
+        bytes[method] = methodBytes;
+    }
+    bytes = Object.entries(bytes);
+    bytes = sortBy(bytes, [1, -1], 0);
+    bytes = bytes.slice(0, 10);
+    let byteIndex = 1;
+    methodBytesTable.innerHTML = "";
+    for (const entry of bytes) {
+        methodBytesTable.append( buildCountLine(entry, byteIndex++) );
     }
 }
 
