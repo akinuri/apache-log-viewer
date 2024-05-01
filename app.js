@@ -1,12 +1,16 @@
 let accessLogTextInputBox = qs("#access-log-text-input");
 let pathGroupsInputBox = qs("#path-groups-input");
+
 let logsBody = qs("#logs-table tbody");
+
 let ipCountBody = qs("#ip-count-table tbody");
 let dateCountBody = qs("#date-count-table tbody");
 let methodCountBody = qs("#method-count-table tbody");
 let pathGroupsCountBody = qs("#path-groups-count-table tbody");
 let protocolCountBody = qs("#protocol-count-table tbody");
 let statusCountBody = qs("#status-count-table tbody");
+
+let ipBytesTable = qs("#ip-bytes-table tbody");
 
 on(pathGroupsInputBox, "input", debounce(() => {
     pathGroupsInputBox.value = trimTextWhitespace(pathGroupsInputBox.value);
@@ -20,14 +24,12 @@ on("#parse-btn", "click", () => {
     printLogsLines(logs);
     
     printIpRequestCounts(logs);
-    
     printDateRequestCounts(logs);
-    
     printMethodRequestCounts(logs);
-    
     printPathGroupsRequestCounts(logs);
-    
     printStatusRequestCounts(logs);
+    
+    printIpRequestBytes(logs);
 });
 
 
@@ -195,4 +197,32 @@ function buildCountLine(entry, index) {
 }
 
 // #endregion
+
+
+// #region ==================== BYTES
+
+function printIpRequestBytes(logs) {
+    let bytes = {};
+    let ips = Array.from(new Set(getColumn(logs, "ip")));
+    for (const ip of ips) {
+        let ipRequests = logs.filter(log => log.ip == ip);
+        let ipBytes = getColumn(ipRequests, "length")
+            .filter(value => value != "-")
+            .map(value => parseInt(value));
+        ipBytes = sum(ipBytes);
+        ipBytes = parseFloat((ipBytes / 1024 / 1024).toFixed(2));
+        bytes[ip] = ipBytes;
+    }
+    bytes = Object.entries(bytes);
+    bytes = sortBy(bytes, [1, -1], 0);
+    bytes = bytes.slice(0, 10);
+    let byteIndex = 1;
+    ipBytesTable.innerHTML = "";
+    for (const entry of bytes) {
+        ipBytesTable.append( buildCountLine(entry, byteIndex++) );
+    }
+}
+
+// #endregion
+
 
