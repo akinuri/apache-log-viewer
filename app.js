@@ -30,6 +30,9 @@ on("#parse-btn", "click", () => {
     printStatusRequestCounts(logs);
 });
 
+
+// #region ==================== LOGS
+
 function printLogsLines(logs) {
     let maxLogRowCount = 1000;
     let logIndex = 1;
@@ -41,6 +44,45 @@ function printLogsLines(logs) {
         }
     }
 }
+
+function buildLogLine(log, index) {
+    let row = elem(
+        "tr",
+        {
+            "class" : "*:px-2 *:py-[2px] *:border hover:bg-slate-50",
+        },
+        [
+            elem("td", index),
+            elem("td", log.ip),
+            elem("td", log.identity),
+            elem("td", log.user),
+            elem("td", log.datetime),
+        ],
+    );
+    if (log.request.method) {
+        row.append(
+            elem("td", log.request.method),
+            elem("td", log.request.path),
+            elem("td", log.request.protocol),
+        );
+    } else {
+        row.append(
+            elem("td", {"colspan" : 3, "class" : "bg-red-50"}, log.request.raw),
+        );
+    }
+    row.append(
+        elem("td", log.status),
+        elem("td", log.length),
+        elem("td", log.referrer),
+        elem("td", log.ua),
+    );
+    return row;
+}
+
+// #endregion
+
+
+// #region ==================== COUNTS
 
 function printIpRequestCounts(logs) {
     let ipFrequency = calcFrequency(getColumn(logs, "ip"));
@@ -138,40 +180,6 @@ function printStatusRequestCounts(logs) {
     }
 }
 
-function buildLogLine(log, index) {
-    let row = elem(
-        "tr",
-        {
-            "class" : "*:px-2 *:py-[2px] *:border hover:bg-slate-50",
-        },
-        [
-            elem("td", index),
-            elem("td", log.ip),
-            elem("td", log.identity),
-            elem("td", log.user),
-            elem("td", log.datetime),
-        ],
-    );
-    if (log.request.method) {
-        row.append(
-            elem("td", log.request.method),
-            elem("td", log.request.path),
-            elem("td", log.request.protocol),
-        );
-    } else {
-        row.append(
-            elem("td", {"colspan" : 3, "class" : "bg-red-50"}, log.request.raw),
-        );
-    }
-    row.append(
-        elem("td", log.status),
-        elem("td", log.length),
-        elem("td", log.referrer),
-        elem("td", log.ua),
-    );
-    return row;
-}
-
 function buildCountLine(entry, index) {
     return elem(
         "tr",
@@ -185,3 +193,6 @@ function buildCountLine(entry, index) {
         ],
     );
 }
+
+// #endregion
+
