@@ -19,6 +19,30 @@ on("#parse-btn", "click", () => {
     
     printLogsLines(logs);
     
+    printIpRequestCounts(logs);
+    
+    printDateRequestCounts(logs);
+    
+    printMethodRequestCounts(logs);
+    
+    printPathGroupsRequestCounts(logs);
+    
+    printStatusRequestCounts(logs);
+});
+
+function printLogsLines(logs) {
+    let maxLogRowCount = 1000;
+    let logIndex = 1;
+    logsBody.innerHTML = "";
+    for (const log of logs) {
+        logsBody.append( buildLogLine(log, logIndex++) );
+        if (logIndex > maxLogRowCount) {
+            break;
+        }
+    }
+}
+
+function printIpRequestCounts(logs) {
     let ipFrequency = calcFrequency(getColumn(logs, "ip"));
     ipFrequency = Object.entries(ipFrequency);
     ipFrequency = sortBy(ipFrequency, [1, -1], 0);
@@ -28,7 +52,9 @@ on("#parse-btn", "click", () => {
     for (const entry of ipFrequency) {
         ipCountBody.append( buildCountLine(entry, ipIndex++) );
     }
-    
+}
+
+function printDateRequestCounts(logs) {
     let dateFrequency = calcFrequency(
         getColumn(logs, log => {
             return isoDateFromParsedDate(parseISODateTime(log.datetime));
@@ -41,7 +67,9 @@ on("#parse-btn", "click", () => {
     for (const entry of dateFrequency) {
         dateCountBody.append( buildCountLine(entry, dateIndex++) );
     }
-    
+}
+
+function printMethodRequestCounts(logs) {
     let methodFrequency = calcFrequency(getColumn(logs, "request.method"));
     methodFrequency = Object.entries(methodFrequency);
     methodFrequency = sortBy(methodFrequency, [1, -1], 0);
@@ -50,7 +78,9 @@ on("#parse-btn", "click", () => {
     for (const entry of methodFrequency) {
         methodCountBody.append( buildCountLine(entry, methodIndex++) );
     }
-    
+}
+
+function printPathGroupsRequestCounts(logs) {
     let pathGroups = parsePathGroups(pathGroupsInputBox.value);
     let pathGroupsFrequency = {
         "[OTHER]" : 0,
@@ -95,7 +125,9 @@ on("#parse-btn", "click", () => {
     for (const entry of protocolFrequency) {
         protocolCountBody.append( buildCountLine(entry, protocolIndex++) );
     }
-    
+}
+
+function printStatusRequestCounts(logs) {
     let statusFrequency = calcFrequency(getColumn(logs, "status"));
     statusFrequency = Object.entries(statusFrequency);
     statusFrequency = sortBy(statusFrequency, [1, -1], 0);
@@ -103,18 +135,6 @@ on("#parse-btn", "click", () => {
     statusCountBody.innerHTML = "";
     for (const entry of statusFrequency) {
         statusCountBody.append( buildCountLine(entry, statusIndex++) );
-    }
-});
-
-function printLogsLines(logs) {
-    let maxLogRowCount = 1000;
-    let logIndex = 1;
-    logsBody.innerHTML = "";
-    for (const log of logs) {
-        logsBody.append( buildLogLine(log, logIndex++) );
-        if (logIndex > maxLogRowCount) {
-            break;
-        }
     }
 }
 
