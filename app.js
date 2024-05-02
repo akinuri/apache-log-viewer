@@ -3,6 +3,13 @@ let pathGroupsInputBox = qs("#path-groups-input");
 
 let logsBody = qs("#logs-table tbody");
 
+let statEls = {
+    daysCount : qs("#days-count"),
+    requestsCount : qs("#requests-count"),
+    ipsCount : qs("#ips-count"),
+    bytesSum : qs("#bytes-sum"),
+};
+
 let ipCountBody = qs("#ip-count-table tbody");
 let dateCountBody = qs("#date-count-table tbody");
 let methodCountBody = qs("#method-count-table tbody");
@@ -27,6 +34,23 @@ on("#parse-btn", "click", () => {
     let logs = parseAccessLogs(accessLogTextInputBox.value);
     
     printLogsLines(logs);
+    
+    statEls.daysCount.textContent = new Set(
+        getColumn(
+            logs,
+            log => isoDateFromParsedDate(parseISODateTime(log.datetime))
+        )
+    ).size;
+    statEls.requestsCount.textContent = logs.length;
+    statEls.ipsCount.textContent = new Set(getColumn(logs, "ip")).size;
+    statEls.bytesSum.textContent = (
+        sum(
+            getColumn(logs, "length")
+                .filter(value => value != "-")
+                .map(value => parseInt(value))
+        )
+        / 1024 / 1024
+    ).toFixed(2);
     
     printIpRequestCounts(logs);
     printDateRequestCounts(logs);
