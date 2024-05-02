@@ -321,7 +321,6 @@ function printPathGroupsRequestBytes(logs) {
         }
         bytes = Object.entries(bytes);
         bytes = sortBy(bytes, [1, -1], 0);
-        bytes = bytes.slice(0, 10);
         let byteIndex = 1;
         pathGroupsBytesBody.innerHTML = "";
         for (const entry of bytes) {
