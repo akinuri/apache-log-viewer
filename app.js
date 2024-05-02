@@ -13,6 +13,7 @@ let statusCountBody = qs("#status-count-table tbody");
 let ipBytesTable = qs("#ip-bytes-table tbody");
 let dateBytesTable = qs("#date-bytes-table tbody");
 let methodBytesTable = qs("#method-bytes-table tbody");
+let pathGroupsBytesTable = qs("#path-groups-bytes-table tbody");
 
 on(pathGroupsInputBox, "input", debounce(() => {
     pathGroupsInputBox.value = trimTextWhitespace(pathGroupsInputBox.value);
@@ -34,6 +35,7 @@ on("#parse-btn", "click", () => {
     printIpRequestBytes(logs);
     printDateRequestBytes(logs);
     printMethodRequestBytes(logs);
+    printPathGroupsRequestBytes(logs);
 });
 
 
@@ -277,6 +279,51 @@ function printMethodRequestBytes(logs) {
     methodBytesTable.innerHTML = "";
     for (const entry of bytes) {
         methodBytesTable.append( buildCountLine(entry, byteIndex++) );
+    }
+}
+
+function printPathGroupsRequestBytes(logs) {
+    let pathGroups = parsePathGroups(pathGroupsInputBox.value);
+    let bytes = {
+        "[OTHER]" : [],
+        "[INVALID]" : [],
+    };
+    pathGroupsBytesTable.innerHTML = "";
+    if (Object.keys(pathGroups).length) {
+        for (const log of logs) {
+            let contentLength = log.length != "-" ? log.length : 0;
+            if (!log.request.path) {
+                bytes["[INVALID]"].push(contentLength);
+                continue;
+            }
+            let groupMatch = false;
+            for (const pathGroupName in pathGroups) {
+                const pathGroupRegex = pathGroups[pathGroupName];
+                if (pathGroupRegex.exec(log.request.path)) {
+                    groupMatch = true;
+                    if (bytes[pathGroupName]) {
+                        bytes[pathGroupName].push(contentLength);
+                    } else {
+                        bytes[pathGroupName] = [];
+                    }
+                }
+            }
+            if (!groupMatch) {
+                bytes["[OTHER]"].push(contentLength);
+            }
+        }
+        for (const pathGroupName in bytes) {
+            bytes[pathGroupName] = sum(bytes[pathGroupName]);
+            bytes[pathGroupName] = parseFloat((bytes[pathGroupName] / 1024 / 1024).toFixed(2));
+        }
+        bytes = Object.entries(bytes);
+        bytes = sortBy(bytes, [1, -1], 0);
+        bytes = bytes.slice(0, 10);
+        let byteIndex = 1;
+        pathGroupsBytesTable.innerHTML = "";
+        for (const entry of bytes) {
+            pathGroupsBytesTable.append( buildCountLine(entry, byteIndex++) );
+        }
     }
 }
 
