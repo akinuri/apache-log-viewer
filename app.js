@@ -10,10 +10,10 @@ let pathGroupsCountBody = qs("#path-groups-count-table tbody");
 let protocolCountBody = qs("#protocol-count-table tbody");
 let statusCountBody = qs("#status-count-table tbody");
 
-let ipBytesTable = qs("#ip-bytes-table tbody");
-let dateBytesTable = qs("#date-bytes-table tbody");
-let methodBytesTable = qs("#method-bytes-table tbody");
-let pathGroupsBytesTable = qs("#path-groups-bytes-table tbody");
+let ipBytesBody = qs("#ip-bytes-table tbody");
+let dateBytesBody = qs("#date-bytes-table tbody");
+let methodBytesBody = qs("#method-bytes-table tbody");
+let pathGroupsBytesBody = qs("#path-groups-bytes-table tbody");
 
 on(pathGroupsInputBox, "input", debounce(() => {
     pathGroupsInputBox.value = trimTextWhitespace(pathGroupsInputBox.value);
@@ -226,9 +226,9 @@ function printIpRequestBytes(logs) {
     bytes = sortBy(bytes, [1, -1], 0);
     bytes = bytes.slice(0, 10);
     let byteIndex = 1;
-    ipBytesTable.innerHTML = "";
+    ipBytesBody.innerHTML = "";
     for (const entry of bytes) {
-        ipBytesTable.append( buildCountLine(entry, byteIndex++) );
+        ipBytesBody.append( buildCountLine(entry, byteIndex++) );
     }
 }
 
@@ -257,9 +257,9 @@ function printDateRequestBytes(logs) {
     bytes = sortBy(bytes, [1, -1], 0);
     bytes = bytes.slice(0, 10);
     let byteIndex = 1;
-    dateBytesTable.innerHTML = "";
+    dateBytesBody.innerHTML = "";
     for (const entry of bytes) {
-        dateBytesTable.append( buildCountLine(entry, byteIndex++) );
+        dateBytesBody.append( buildCountLine(entry, byteIndex++) );
     }
 }
 
@@ -279,9 +279,9 @@ function printMethodRequestBytes(logs) {
     bytes = sortBy(bytes, [1, -1], 0);
     bytes = bytes.slice(0, 10);
     let byteIndex = 1;
-    methodBytesTable.innerHTML = "";
+    methodBytesBody.innerHTML = "";
     for (const entry of bytes) {
-        methodBytesTable.append( buildCountLine(entry, byteIndex++) );
+        methodBytesBody.append( buildCountLine(entry, byteIndex++) );
     }
 }
 
@@ -291,7 +291,7 @@ function printPathGroupsRequestBytes(logs) {
         "[OTHER]" : [],
         "[INVALID]" : [],
     };
-    pathGroupsBytesTable.innerHTML = "";
+    pathGroupsBytesBody.innerHTML = "";
     if (Object.keys(pathGroups).length) {
         for (const log of logs) {
             let contentLength = log.length != "-" ? log.length : 0;
@@ -323,9 +323,9 @@ function printPathGroupsRequestBytes(logs) {
         bytes = sortBy(bytes, [1, -1], 0);
         bytes = bytes.slice(0, 10);
         let byteIndex = 1;
-        pathGroupsBytesTable.innerHTML = "";
+        pathGroupsBytesBody.innerHTML = "";
         for (const entry of bytes) {
-            pathGroupsBytesTable.append( buildCountLine(entry, byteIndex++) );
+            pathGroupsBytesBody.append( buildCountLine(entry, byteIndex++) );
         }
     }
 }
