@@ -30,6 +30,7 @@ on("#parse-btn", "click", () => {
     printDateRequestCounts(logs);
     printMethodRequestCounts(logs);
     printPathGroupsRequestCounts(logs);
+    printProtocolRequestCounts(logs);
     printStatusRequestCounts(logs);
     
     printIpRequestBytes(logs);
@@ -166,7 +167,9 @@ function printPathGroupsRequestCounts(logs) {
             pathGroupsCountBody.append( buildCountLine(entry, pathGroupIndex++) );
         }
     }
-    
+}
+
+function printProtocolRequestCounts(logs) {
     let protocolFrequency = calcFrequency(getColumn(logs, "request.protocol"));
     protocolFrequency = Object.entries(protocolFrequency);
     protocolFrequency = sortBy(protocolFrequency, [1, -1], 0);
