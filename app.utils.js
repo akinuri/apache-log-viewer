@@ -12,8 +12,9 @@ function parseAccessLogLine(
     logLine,
     partNames = ["ip", "identity", "user", "datetime", "request", "status", "length", "referrer", "ua"],
 ) {
-    let request = parseAccessLogLineRequestPart(logLine);
-    logLine = logLine.replace('"' + request.raw + '"', "");
+    let quotedParts = getAccessLogQuotedParts(logLine);
+    quotedParts.request = parseAccessLogLineRequestPart(quotedParts.request);
+    logLine = logLine.replace('"' + quotedParts.request.raw + '"', "");
     const splitPattern = /[^\s\[]+|\[([^\]]+)\]/gi;
     let parts = [];
     let match;
@@ -26,16 +27,24 @@ function parseAccessLogLine(
     }
     let requestIndex = partNames.indexOf("request");
     if (requestIndex !== -1) {
-        parts.splice(requestIndex, 0, request);
+        parts.splice(requestIndex, 0, quotedParts.request);
     }
     parts = arrayCombine(partNames, parts);
     parts.datetime = isoDateTimeFromParsedDate(parseAccessLogDate(parts.datetime));
     return parts;
 }
 
-function parseAccessLogLineRequestPart(logLine, partNames = ["method", "path", "protocol"]) {
+function getAccessLogQuotedParts(logLine, partNames = ["request", "referrer", "ua"]) {
+    let pattern = /"(?:\\.|[^"\\])*"/g;
+    let parts = logLine.match(pattern);
+    parts = parts.map(part => part.slice(1, -1));
+    let namedParts = arrayCombine(partNames, parts);
+    return namedParts;
+}
+
+function parseAccessLogLineRequestPart(requestStr, partNames = ["method", "path", "protocol"]) {
     let request = {
-        raw: /\] "(.*)" \d+ /s.exec(logLine)[1],
+        raw: requestStr,
     };
     request = Object.assign(request, arrayCombine(partNames, Array(partNames.length).fill(null)));
     let isRegularRequest = /^(GET|POST|HEAD|CONNECT|OPTIONS|PUT|PATCH|DELETE|TRACE)/.exec(request.raw);
