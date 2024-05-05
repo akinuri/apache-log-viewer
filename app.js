@@ -16,6 +16,7 @@ let methodCountBody = qs("#method-count-table tbody");
 let pathGroupsCountBody = qs("#path-groups-count-table tbody");
 let protocolCountBody = qs("#protocol-count-table tbody");
 let statusCountBody = qs("#status-count-table tbody");
+let referrerCountBody = qs("#referrer-count-table tbody");
 
 let ipBytesBody = qs("#ip-bytes-table tbody");
 let dateBytesBody = qs("#date-bytes-table tbody");
@@ -58,6 +59,7 @@ on("#parse-btn", "click", () => {
     printPathGroupsRequestCounts(logs);
     printProtocolRequestCounts(logs);
     printStatusRequestCounts(logs);
+    printReferrerRequestCounts(logs);
     
     printIpRequestBytes(logs);
     printDateRequestBytes(logs);
@@ -104,7 +106,7 @@ function buildLogLine(log, index) {
         );
     } else {
         row.append(
-            elem("td", {"colspan" : 3, "class" : "bg-red-50"}, log.request.raw),
+            elem("td", {"colspan" : 3, "class" : "bg-red-50"}, log.request.raw.slice(1, -1)),
         );
     }
     row.append(
@@ -216,6 +218,28 @@ function printStatusRequestCounts(logs) {
     statusCountBody.innerHTML = "";
     for (const entry of statusFrequency) {
         statusCountBody.append( buildCountLine(entry, statusIndex++) );
+    }
+}
+
+function printReferrerRequestCounts(logs) {
+    let referrers = getColumn(logs, "referrer");
+    referrers = referrers.map((ref, i) => {
+        if (isQuoted(ref)) {
+            ref = unquote(ref);
+        }
+        if (ref != "-") {
+            let url = new URL(ref);
+            return url.hostname || url.href;
+        }
+        return ref;
+    });
+    let referrerFrequency = calcFrequency(referrers);
+    referrerFrequency = Object.entries(referrerFrequency);
+    referrerFrequency = sortBy(referrerFrequency, [1, -1], 0);
+    let referrerIndex = 1;
+    referrerCountBody.innerHTML = "";
+    for (const entry of referrerFrequency) {
+        referrerCountBody.append( buildCountLine(entry, referrerIndex++) );
     }
 }
 
