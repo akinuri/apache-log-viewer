@@ -24,6 +24,7 @@ let methodBytesBody = qs("#method-bytes-table tbody");
 let pathGroupsBytesBody = qs("#path-groups-bytes-table tbody");
 let protocolBytesBody = qs("#protocol-bytes-table tbody");
 let statusBytesBody = qs("#status-bytes-table tbody");
+let referrerBytesBody = qs("#referrer-bytes-table tbody");
 
 on(pathGroupsInputBox, "input", debounce(() => {
     pathGroupsInputBox.value = trimTextWhitespace(pathGroupsInputBox.value);
@@ -67,6 +68,7 @@ on("#parse-btn", "click", () => {
     printPathGroupsRequestBytes(logs);
     printProtocolRequestBytes(logs);
     printStatusRequestBytes(logs);
+    printReferrerRequestBytes(logs);
 });
 
 
@@ -112,8 +114,8 @@ function buildLogLine(log, index) {
     row.append(
         elem("td", log.status),
         elem("td", log.length),
-        elem("td", log.referrer.slice(1, -1)),
-        elem("td", log.ua.slice(1, -1)),
+        elem("td", log.referrer?.slice(1, -1)),
+        elem("td", log.ua?.slice(1, -1)),
     );
     return row;
 }
@@ -223,16 +225,7 @@ function printStatusRequestCounts(logs) {
 
 function printReferrerRequestCounts(logs) {
     let referrers = getColumn(logs, "referrer");
-    referrers = referrers.map((ref, i) => {
-        if (isQuoted(ref)) {
-            ref = unquote(ref);
-        }
-        if (ref != "-") {
-            let url = new URL(ref);
-            return url.hostname || url.href;
-        }
-        return ref;
-    });
+    referrers = referrers.map(ref => getLogReferrerHost(ref));
     let referrerFrequency = calcFrequency(referrers);
     referrerFrequency = Object.entries(referrerFrequency);
     referrerFrequency = sortBy(referrerFrequency, [1, -1], 0);
@@ -422,6 +415,30 @@ function printStatusRequestBytes(logs) {
     statusBytesBody.innerHTML = "";
     for (const entry of bytes) {
         statusBytesBody.append( buildCountLine(entry, byteIndex++) );
+    }
+}
+
+function printReferrerRequestBytes(logs) {
+    let bytes = {};
+    let referrers = getColumn(logs, "referrer");
+    referrers = referrers.map(ref => getLogReferrerHost(ref));
+    referrers = Array.from(new Set(referrers));
+    for (const referrer of referrers) {
+        let referrerRequests = logs.filter(log => getLogReferrerHost(log.referrer) == referrer);
+        let referrerBytes = getColumn(referrerRequests, "length")
+            .filter(value => value != "-")
+            .map(value => parseInt(value));
+        referrerBytes = sum(referrerBytes);
+        referrerBytes = parseFloat((referrerBytes / 1024 / 1024).toFixed(2));
+        bytes[referrer] = referrerBytes;
+    }
+    bytes = Object.entries(bytes);
+    bytes = sortBy(bytes, [1, -1], 0);
+    bytes = bytes.slice(0, 10);
+    let byteIndex = 1;
+    referrerBytesBody.innerHTML = "";
+    for (const entry of bytes) {
+        referrerBytesBody.append( buildCountLine(entry, byteIndex++) );
     }
 }
 
