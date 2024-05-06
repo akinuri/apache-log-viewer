@@ -9,6 +9,7 @@ let statEls = {
     ipsCount : qs("#ips-count"),
     bytesSum : qs("#bytes-sum"),
     referrersCount : qs("#referrers-count"),
+    uaCount : qs("#ua-count"),
 };
 
 let ipCountBody = qs("#ip-count-table tbody");
@@ -58,6 +59,7 @@ on("#parse-btn", "click", () => {
     statEls.referrersCount.textContent = new Set(
         getColumn(logs, "referrer").map(ref => getLogReferrerHost(ref))
     ).size;
+    statEls.uaCount.textContent = new Set(getColumn(logs, "ua")).size;
     
     printIpRequestCounts(logs);
     printDateRequestCounts(logs);
