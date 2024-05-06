@@ -98,6 +98,9 @@ function getLogReferrerHost(referrer) {
     }
     if (referrer != "-") {
         let url;
+        if (!referrer.startsWith("http")) {
+            referrer = "https://" + referrer;
+        }
         try {
             url = new URL(referrer);
         } catch (error) {
