@@ -97,8 +97,14 @@ function getLogReferrerHost(referrer) {
         referrer = unquote(referrer);
     }
     if (referrer != "-") {
-        let url = new URL(referrer);
-        return url.hostname || url.href;
+        let url;
+        try {
+            url = new URL(referrer);
+        } catch (error) {
+            console.log([referrer]);
+            throw error;
+        }
+        return url.host || url.href;
     }
     return referrer;
 }
