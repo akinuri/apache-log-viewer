@@ -93,9 +93,7 @@ function getLogReferrerHost(referrer) {
     if (!referrer) {
         return referrer;
     }
-    if (isQuoted(referrer)) {
-        referrer = unquote(referrer);
-    }
+    referrer = unquote(referrer);
     if (referrer != "-") {
         let url;
         if (!referrer.startsWith("http")) {

@@ -185,6 +185,9 @@ function isQuoted(value) {
 }
 
 function unquote(value) {
-    return value.slice(1, -1);
+    if (isQuoted(value)) {
+        return value.slice(1, -1);
+    }
+    return value;
 }
 
