@@ -34,6 +34,17 @@ on(pathGroupsInputBox, "input", debounce(() => {
     pathGroupsInputBox.value = trimTextWhitespace(pathGroupsInputBox.value);
 }));
 
+on(accessLogTextInputBox, "paste", function logPasteDuration() {
+    const startTime = performance.now();
+    setTimeout(function() {
+        const endTime = performance.now();
+        const pasteTime = endTime - startTime;
+        let charCount = accessLogTextInputBox.value.length;
+        let size = (charCount / 1024 / 1024).toFixed(2);
+        console.log(`Pasted ${charCount} chars (${size} MB) in ${Math.round(pasteTime)} ms`);
+    });
+});
+
 trigger(pathGroupsInputBox, "input");
 
 on("#parse-btn", "click", () => {
