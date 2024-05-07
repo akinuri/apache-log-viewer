@@ -28,6 +28,7 @@ let pathGroupsBytesBody = qs("#path-groups-bytes-table tbody");
 let protocolBytesBody = qs("#protocol-bytes-table tbody");
 let statusBytesBody = qs("#status-bytes-table tbody");
 let referrerBytesBody = qs("#referrer-bytes-table tbody");
+let uaBytesBody = qs("#ua-bytes-table tbody");
 
 on(pathGroupsInputBox, "input", debounce(() => {
     pathGroupsInputBox.value = trimTextWhitespace(pathGroupsInputBox.value);
@@ -77,6 +78,7 @@ on("#parse-btn", "click", () => {
     printProtocolRequestBytes(logs);
     printStatusRequestBytes(logs);
     printReferrerRequestBytes(logs);
+    printUARequestBytes(logs);
 });
 
 
@@ -467,6 +469,36 @@ function printReferrerRequestBytes(logs) {
     referrerBytesBody.innerHTML = "";
     for (const entry of bytes) {
         referrerBytesBody.append( buildCountLine(entry, byteIndex++) );
+    }
+}
+
+function printUARequestBytes(logs) {
+    let bytes = {};
+    let uas = Array.from(new Set(getColumn(logs, "ua")));
+    for (const ua of uas) {
+        let uaRequests = logs.filter(log => log.ua == ua);
+        let uaBytes = getColumn(uaRequests, "length")
+            .filter(value => value != "-")
+            .map(value => parseInt(value));
+        uaBytes = sum(uaBytes);
+        uaBytes = parseFloat((uaBytes / 1024 / 1024).toFixed(2));
+        bytes[ua] = uaBytes;
+    }
+    bytes = Object.entries(bytes);
+    bytes = sortBy(bytes, [1, -1], 0);
+    bytes = bytes.slice(0, 10);
+    bytes = bytes.map(entry => {
+        entry[0] = unquote(entry[0]);
+        if (entry[0].startsWith("Mozilla/5.0")) {
+            entry[0] = entry[0].replace("Mozilla/5.0 ", "");
+        }
+        entry[0] = ellipsis(entry[0], 64);
+        return entry;
+    });
+    let uaIndex = 1;
+    uaBytesBody.innerHTML = "";
+    for (const entry of bytes) {
+        uaBytesBody.append( buildCountLine(entry, uaIndex++) );
     }
 }
 
