@@ -48,10 +48,20 @@ on(accessLogTextInputBox, "paste", function logPasteDuration() {
 trigger(pathGroupsInputBox, "input");
 
 on("#parse-btn", "click", () => {
+    
+    let sw = new Stopwatch();
+    
+    sw.time("all");
+    
+    sw.time("parse");
     let logs = parseAccessLogs(accessLogTextInputBox.value);
+    sw.timeEnd("parse");
     
+    sw.time("print lines");
     printLogsLines(logs);
+    sw.timeEnd("print lines");
     
+    sw.time("stats");
     statEls.daysCount.textContent = new Set(
         getColumn(
             logs,
@@ -72,7 +82,9 @@ on("#parse-btn", "click", () => {
         getColumn(logs, "referrer").map(ref => getLogReferrerHost(ref))
     ).size;
     statEls.uaCount.textContent = new Set(getColumn(logs, "ua")).size;
+    sw.timeEnd("stats");
     
+    sw.time("counts");
     printIpRequestCounts(logs);
     printDateRequestCounts(logs);
     printMethodRequestCounts(logs);
@@ -81,7 +93,9 @@ on("#parse-btn", "click", () => {
     printStatusRequestCounts(logs);
     printReferrerRequestCounts(logs);
     printUARequestCounts(logs);
+    sw.timeEnd("counts");
     
+    sw.time("bytes");
     printIpRequestBytes(logs);
     printDateRequestBytes(logs);
     printMethodRequestBytes(logs);
@@ -90,6 +104,11 @@ on("#parse-btn", "click", () => {
     printStatusRequestBytes(logs);
     printReferrerRequestBytes(logs);
     printUARequestBytes(logs);
+    sw.timeEnd("bytes");
+    
+    sw.timeEnd("all");
+    
+    console.table(sw.getResult(), ["duration"]);
 });
 
 
