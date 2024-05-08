@@ -96,14 +96,39 @@ on("#parse-btn", "click", () => {
     sw.timeEnd("counts");
     
     sw.time("bytes");
+    
+    sw.time("bytes - ip");
     printIpRequestBytes(logs);
+    sw.timeEnd("bytes - ip");
+    
+    sw.time("bytes - date");
     printDateRequestBytes(logs);
+    sw.timeEnd("bytes - date");
+    
+    sw.time("bytes - method");
     printMethodRequestBytes(logs);
+    sw.timeEnd("bytes - method");
+    
+    sw.time("bytes - path");
     printPathGroupsRequestBytes(logs);
+    sw.timeEnd("bytes - path");
+    
+    sw.time("bytes - protocol");
     printProtocolRequestBytes(logs);
+    sw.timeEnd("bytes - protocol");
+    
+    sw.time("bytes - status");
     printStatusRequestBytes(logs);
+    sw.timeEnd("bytes - status");
+    
+    sw.time("bytes - referrer");
     printReferrerRequestBytes(logs);
+    sw.timeEnd("bytes - referrer");
+    
+    sw.time("bytes - ua");
     printUARequestBytes(logs);
+    sw.timeEnd("bytes - ua");
+    
     sw.timeEnd("bytes");
     
     sw.timeEnd("all");
