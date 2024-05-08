@@ -108,7 +108,7 @@ on("#parse-btn", "click", () => {
     
     sw.timeEnd("all");
     
-    console.table(sw.getResult(), ["duration"]);
+    console.table(sw.getDurations());
 });
 
 
