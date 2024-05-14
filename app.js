@@ -1,3 +1,5 @@
+// #region ==================== ELEMENTS
+
 let accessLogTextInputBox = qs("#access-log-text-input");
 let pathGroupsInputBox = qs("#path-groups-input");
 
@@ -29,6 +31,11 @@ let protocolBytesBody = qs("#protocol-bytes-table tbody");
 let statusBytesBody = qs("#status-bytes-table tbody");
 let referrerBytesBody = qs("#referrer-bytes-table tbody");
 let uaBytesBody = qs("#ua-bytes-table tbody");
+
+// #endregion
+
+
+// #region ==================== EVENTS
 
 on(pathGroupsInputBox, "input", debounce(() => {
     pathGroupsInputBox.value = trimTextWhitespace(pathGroupsInputBox.value);
@@ -135,6 +142,8 @@ on("#parse-btn", "click", () => {
     
     console.table(sw.getDurations());
 });
+
+// #endregion
 
 
 // #region ==================== LOGS
