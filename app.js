@@ -218,7 +218,7 @@ function printDateRequestCounts(logs) {
         })
     );
     dateFrequency = Object.entries(dateFrequency);
-    dateFrequency = sortBy(dateFrequency, [1, -1], 0);
+    // dateFrequency = sortBy(dateFrequency, [1, -1], 0);
     let dateIndex = 1;
     dateCountBody.innerHTML = "";
     for (const entry of dateFrequency) {
@@ -393,7 +393,7 @@ function printDateRequestBytes(logs) {
         bytes[date] = dateBytes;
     }
     bytes = Object.entries(bytes);
-    bytes = sortBy(bytes, [1, -1], 0);
+    // bytes = sortBy(bytes, [1, -1], 0);
     bytes = bytes.slice(0, 10);
     let byteIndex = 1;
     dateBytesBody.innerHTML = "";
