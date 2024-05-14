@@ -351,24 +351,47 @@ function buildCountLine(entry, index) {
 
 function printIpRequestBytes(logs) {
     let bytes = {};
+    let sw = new Stopwatch();
+    sw.time("bytes - ip - get");
     let ips = Array.from(new Set(getColumn(logs, "ip")));
+    sw.timeEnd("bytes - ip - get");
+    sw.time("bytes - ip - calc");
     for (const ip of ips) {
+        sw.time("bytes - ip - calc - requests");
+        /**
+         * Woah. 
+         * 550m loops for 7500 ips and 74000 requests.
+         * This takes the most time.
+         * // TODO: group the requests by ips?
+         */
         let ipRequests = logs.filter(log => log.ip == ip);
+        sw.timeAggregate("bytes - ip - calc - requests");
+        sw.time("bytes - ip - calc - bytes");
         let ipBytes = getColumn(ipRequests, "length")
             .filter(value => value != "-")
             .map(value => parseInt(value));
+        sw.timeAggregate("bytes - ip - calc - bytes");
+        sw.time("bytes - ip - calc - sum");
         ipBytes = sum(ipBytes);
         ipBytes = parseFloat((ipBytes / 1024 / 1024).toFixed(2));
         bytes[ip] = ipBytes;
+        sw.timeAggregate("bytes - ip - calc - sum");
     }
+    sw.timeEnd("bytes - ip - calc");
+    sw.time("bytes - ip - sort");
     bytes = Object.entries(bytes);
     bytes = sortBy(bytes, [1, -1], 0);
     bytes = bytes.slice(0, 10);
+    sw.timeEnd("bytes - ip - sort");
+    sw.time("bytes - ip - print");
     let byteIndex = 1;
     ipBytesBody.innerHTML = "";
     for (const entry of bytes) {
         ipBytesBody.append( buildCountLine(entry, byteIndex++) );
     }
+    sw.timeEnd("bytes - ip - print");
+    console.table(sw.getDurations());
+    console.table(sw.getAggregateDurations());
 }
 
 function printDateRequestBytes(logs) {
